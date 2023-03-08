@@ -1,0 +1,300 @@
+import os
+import platform
+import re
+
+def scan_port(ip, range_port):
+    # create new PortScanner
+    nmap_scan = nmap.PortScanner()
+    print('Start scanning...')
+
+    # start scan port, result is json format
+    try:
+        result = nmap_scan.scan(ip, range_port)
+        dict_port_info = result['scan'][ip]
+        dict_port = dict_port_info['tcp']
+    except Exception as e:
+        print(f'Error scan port: {e.__format__}')
+        return
+
+    # get port open
+    ports = []
+    port_details = []
+    for key, values in dict_port.items():
+        ports.append(key)
+        port_details.append(values)
+
+    # print port open
+    for i in ports:
+        dt = dict_port[i]
+        print(
+            f'Port {i} is {port_details[0]["state"]}. (Scan type: {dt["reason"]}, Running: {dt["product"]} {dt["version"]} {dt["extrainfo"]})')
+
+
+def os_detection(ip):
+    nmap_scan = nmap3.Nmap()
+    try:
+        os_result = nmap_scan.nmap_os_detection(ip)
+dict_os_info = os_result[ip]['osmatch']
+    except Exception as e:
+        print(f'Erro Os detection: {e.__format__}')
+        return
+    os = dict_os_info[0]
+    print(f'Os detect: {os["osclass"]["osfamily"]} (Version: {os["name"]}, Accuracy: {os["accuracy"]}%)')
+    
+
+def map_networking(ip):
+    nmap_scan = nmap3.Nmap()
+    print('Start scanning...')
+    try:
+        #scan ip subnet
+        map_networking_result = nmap_scan.nmap_subnet_scan(ip)
+    except Exception as e:
+        print(f'Erro map networking: {e.__format__}')
+        return
+    #get ip subnet and print out
+    for keys, values in map_networking_result.items():
+        if keys != 'stats':
+            print(f'{keys} is up.')
+
+
+def nes(ip, vul):
+    print('Start scanning vuln...')
+    try:
+        #execute command nmap scripting engine
+        nes_result = os.system(f"nmap -sV --script={vul} {ip}")
+    except Exception as e:
+        print(f'Erro nmap scripting engine: {e.__format__}')
+        return
+    print(nes_result)
+
+
+def check_ip(ip):
+    #ip_regex xxx.xxx.xxx.xxx
+ip_regex = r'^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
+    #ip_regex_2 xxx.xxx.xxx.xxx/xx
+    ip_regex_2 = r'^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([1-9]|[1-2][0-9]|3[0-2])$'
+    if re.search(ip_regex, ip) or re.search(ip_regex_2, ip):
+        return True
+    else:
+        return False
+
+
+def check_range_port(range_port):
+    range_port_regex = r'^([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-5][0-9][0-9][0-9][0-9]|6[0-4][0-9][0-9][0-9]|65[0-4][0-9][0-9]|655[0-2][0-9]|6553[0-5])-([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-5][0-9][0-9][0-9][0-9]|6[0-4][0-9][0-9][0-9]|65[0-4][0-9][0-9]|655[0-2][0-9]|6553[0-5])$'
+    if re.search(range_port_regex, range_port):
+        return True
+    else:
+        return False
+
+def get_current_path():
+    return os.getcwd()
+
+def hello():
+    os.system('clear')
+    print(f'Nmap version: {nmap.PortScanner().nmap_version()}')
+    print(r'''________                       
+\______ \   _________    ____  
+ |    |  \ /  _ \__  \  /    \ 
+ |    `   (  <_> ) __ \|   |  \
+/_______  /\____(____  /___|  /
+        \/           \/     \/ ''')
+    print('1. Scan port, Os detection.')
+    print('2. Map networking.')
+    print('3. Nmap scripting engine.')
+    print('4. Search scripting engine.')
+    print('0. Exit.')
+
+def main():
+    hello()
+    vul = ''
+    option = input('Choose option: ')
+    if option == '1':
+        ip = input('Enter ip(xxx.xxx.xxx.xxx): ')
+        if check_ip(ip):
+            range_port = input('Enter range port(x-xxxx): ')
+            if check_range_port(range_port):
+                scan_port(ip, range_port)
+                os_detection(ip)
+            else:
+                print('Invalid range port.')
+        #press any key to continue
+        input('Press any key to continue...')
+        main()
+    elif option == '2':
+        ip = input('Enter ip(xxx.xxx.xxx.xxx/xx): ')
+        if check_ip(ip):
+            map_networking(ip)
+        else:
+            print('Invalid ip.')
+        #press any key to continue
+        input('Press any key to continue...')
+        main()
+    elif option == '3':
+        ip = input('Enter ip(xxx.xxx.xxx.xxx): ')
+        if check_ip(ip):
+            vul = input('Enter vuln: ')
+            nes(ip, vul)
+        else:
+            print('Invalid ip.')
+        #press any key to continue
+        input('Press any key to continue...')
+import os
+import platform
+import re
+
+def scan_port(ip, range_port):
+    # create new PortScanner
+    nmap_scan = nmap.PortScanner()
+    print('Start scanning...')
+
+    # start scan port, result is json format
+    try:
+        result = nmap_scan.scan(ip, range_port)
+        dict_port_info = result['scan'][ip]
+        dict_port = dict_port_info['tcp']
+    except Exception as e:
+        print(f'Error scan port: {e.__format__}')
+        return
+
+    # get port open
+    ports = []
+    port_details = []
+    for key, values in dict_port.items():
+        ports.append(key)
+        port_details.append(values)
+
+    # print port open
+    for i in ports:
+        dt = dict_port[i]
+        print(
+            f'Port {i} is {port_details[0]["state"]}. (Scan type: {dt["reason"]}, Running: {dt["product"]} {dt["version"]} {dt["extrainfo"]})')
+
+
+def os_detection(ip):
+    nmap_scan = nmap3.Nmap()
+    try:
+        os_result = nmap_scan.nmap_os_detection(ip)
+        dict_os_info = os_result[ip]['osmatch']
+    except Exception as e:
+        print(f'Erro Os detection: {e.__format__}')
+        return
+    os = dict_os_info[0]
+    print(f'Os detect: {os["osclass"]["osfamily"]} (Version: {os["name"]}, Accuracy: {os["accuracy"]}%)')
+    
+
+def map_networking(ip):
+    nmap_scan = nmap3.Nmap()
+    print('Start scanning...')
+    try:
+        #scan ip subnet
+        map_networking_result = nmap_scan.nmap_subnet_scan(ip)
+    except Exception as e:
+        print(f'Erro map networking: {e.__format__}')
+        return
+    #get ip subnet and print out
+    for keys, values in map_networking_result.items():
+        if keys != 'stats':
+            print(f'{keys} is up.')
+
+
+def nes(ip, vul):
+    print('Start scanning vuln...')
+    try:
+        #execute command nmap scripting engine
+        nes_result = os.system(f"nmap -sV --script={vul} {ip}")
+    except Exception as e:
+        print(f'Erro nmap scripting engine: {e.__format__}')
+        return
+    print(nes_result)
+
+
+def check_ip(ip):
+    #ip_regex xxx.xxx.xxx.xxx
+    ip_regex = r'^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
+    #ip_regex_2 xxx.xxx.xxx.xxx/xx
+    ip_regex_2 = r'^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\/([1-9]|[1-2][0-9]|3[0-2])$'
+    if re.search(ip_regex, ip) or re.search(ip_regex_2, ip):
+        return True
+    else:
+        return False
+
+
+def check_range_port(range_port):
+    range_port_regex = r'^([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-5][0-9][0-9][0-9][0-9]|6[0-4][0-9][0-9][0-9]|65[0-4][0-9][0-9]|655[0-2][0-9]|6553[0-5])-([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-5][0-9][0-9][0-9][0-9]|6[0-4][0-9][0-9][0-9]|65[0-4][0-9][0-9]|655[0-2][0-9]|6553[0-5])$'
+    if re.search(range_port_regex, range_port):
+        return True
+    else:
+        return False
+
+def get_current_path():
+    return os.getcwd()
+
+def hello():
+    os.system('clear')
+    print(f'Nmap version: {nmap.PortScanner().nmap_version()}')
+    print(r'''________                       
+\______ \   _________    ____  
+ |    |  \ /  _ \__  \  /    \ 
+ |    `   (  <_> ) __ \|   |  \
+/_______  /\____(____  /___|  /
+        \/           \/     \/ ''')
+    print('1. Scan port, Os detection.')
+    print('2. Map networking.')
+    print('3. Nmap scripting engine.')
+    print('4. Search scripting engine.')
+    print('0. Exit.')
+
+def main():
+    hello()
+    vul = ''
+    option = input('Choose option: ')
+    if option == '1':
+        ip = input('Enter ip(xxx.xxx.xxx.xxx): ')
+        if check_ip(ip):
+            range_port = input('Enter range port(x-xxxx): ')
+            if check_range_port(range_port):
+                scan_port(ip, range_port)
+                os_detection(ip)
+            else:
+                print('Invalid range port.')
+        #press any key to continue
+        input('Press any key to continue...')
+        main()
+    elif option == '2':
+        ip = input('Enter ip(xxx.xxx.xxx.xxx/xx): ')
+        if check_ip(ip):
+            map_networking(ip)
+        else:
+            print('Invalid ip.')
+        #press any key to continue
+        input('Press any key to continue...')
+        main()
+    elif option == '3':
+        ip = input('Enter ip(xxx.xxx.xxx.xxx): ')
+        if check_ip(ip):
+            vul = input('Enter vuln: ')
+            nes(ip, vul)
+        else:
+            print('Invalid ip.')
+        #press any key to continue
+        input('Press any key to continue...')
+        main()
+    elif option == '4':
+        vul = input('Enter vuln: ')
+        #Lấy tên file có đuôi .nse ghi vào vul.txt
+        os.system(f'ls /usr/share/nmap/scripts > {get_current_path()}/vul.txt')
+        #Đọc file vul.txt in kết quả tìm kiếm ra console
+        os.system(f'cat {get_current_path()}/vul.txt | grep {vul}')
+        #press any key to continue
+        input('Press any key to continue...')
+        main()
+    elif option == '0':
+        print('Bye!')
+        exit()
+    else:
+        print('Invalid option')
+        main()    
+
+
+if __name__ == "__main__":
+    main()
